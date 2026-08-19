@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Raksha Bandhan</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- Cursor Sparkles Container -->
+    <div id="cursor-sparkles"></div>
+
+    <!-- 3D Background Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+    
+    <!-- Background Particles Container (Legacy CSS) -->
+    <div id="particles-container"></div>
+    
+    <!-- Setup Screen for Brother -->
+    <div id="setup-screen" class="screen active">
+        <div class="setup-container card">
+            <h1>Create Your Rakhi Surprise</h1>
+            <p>Enter the details below to personalize the gift for your sister.</p>
+            <div class="input-group">
+                <label for="brother-name">Your Name (Brother)</label>
+                <input type="text" id="brother-name" placeholder="e.g. Rahul" required>
+            </div>
+            <div class="input-group">
+                <label for="sister-name">Akka's Name</label>
+                <input type="text" id="sister-name" placeholder="e.g. Priya" required>
+            </div>
+            <button id="start-btn" class="primary-btn">Create Surprise <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+        </div>
+    </div>
+
+    <!-- Funny Surprise Screen (Prank) -->
+    <div id="funny-surprise" class="screen" style="display: none; background: #000; z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif" alt="Funny Cat" style="max-width: 80%; border-radius: 20px; border: 5px solid var(--gold);">
+        <h1 style="color: white; font-family: var(--font-heading); margin-top: 20px; font-size: 3rem;">BOO! 👻</h1>
+        <p style="color: #ccc; font-size: 1.5rem; margin-top: 10px;">Just kidding! Preparing your real surprise... 😂</p>
+    </div>
+
+    <!-- Main Experience Content -->
+    <div id="main-content" class="screen">
+        
+        <!-- Background Music -->
+        <button id="audio-toggle" class="floating-btn bounce">
+            <i class="fa-solid fa-volume-xmark"></i>
+        </button>
+        <audio id="bg-music" loop>
+            <source src="https://cdn.pixabay.com/download/audio/2022/02/07/audio_f8a846ab18.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Section 1: Opening Screen -->
+        <section id="opening-screen" class="full-screen section-padding">
+            <!-- Diyas -->
+            <div class="diya-container top-left-diya"><i class="fa-solid fa-fire-flame-curved flame"></i><div class="diya-base"></div></div>
+            <div class="diya-container top-right-diya"><i class="fa-solid fa-fire-flame-curved flame"></i><div class="diya-base"></div></div>
+            
+            <div class="content-wrapper text-center">
+                <h1 class="elegant-title" id="opening-title">Happy Raksha Bandhan ❤️</h1>
+                <p class="subtitle fade-in hidden">To the most special <span class="sister-name-display">akka</span> in the world...</p>
+                <div class="gift-icon bounce mt-4 hidden" id="opening-gift-icon">
+                    <i class="fa-solid fa-gift fa-4x" style="color: var(--gold);"></i>
+                </div>
+                <button id="open-gift-btn" class="primary-btn mt-4 pulse hidden">🎁 Open Your Rakhi Gift</button>
+            </div>
+        </section>
+
+        <!-- Section 2: Anime Rakhi Scene -->
+        <section id="anime-rakhi-scene" class="full-screen section-padding hidden-section text-center">
+            <h2 class="elegant-title anime-heading">A Special Moment Between Brother & Sister ❤️</h2>
+            
+            <div class="anime-container mt-4">
+                <!-- Background Decorations -->
+                <div class="anime-bg-elements">
+                    <i class="fa-solid fa-fire-flame-curved bg-diya-anime left"></i>
+                    <i class="fa-solid fa-fire-flame-curved bg-diya-anime right"></i>
+                </div>
+
+                <!-- Characters -->
+                <div class="characters-wrapper">
+                    <div class="anime-character brother" id="anime-brother">
+                        <img src="assets/anime_brother.jpg" alt="Anime Brother">
+                        <div class="arm-with-rakhi" id="anime-arm">
+                            <img src="assets/anime_rakhi.jpg" alt="Rakhi" class="anime-rakhi-img" id="anime-rakhi">
+                        </div>
+                    </div>
+                    <div class="anime-character sister" id="anime-sister">
+                        <img src="assets/anime_sister.jpg" alt="Anime Sister">
+                        <div class="sister-wrist" id="anime-wrist"></div>
+                    </div>
+                </div>
+                
+                <div id="anime-heart-burst"></div>
+            </div>
+
+            <p class="subtitle mt-4">Sealing Our Bond With Love & Rakhi 🪷</p>
+            <button id="anime-tie-btn" class="primary-btn mt-4 pulse-fast anime-btn">Tie Rakhi ❤️</button>
+            
+            <p id="anime-success-msg" class="success-msg heartbeat hidden mt-4">Rakhi Tied Successfully! ❤️</p>
+            
+            <div id="anime-emotional-msg" class="hidden mt-4">
+                <p class="poetic-text">"Some bonds are made by blood,<br>but the most beautiful bonds are strengthened by love. ❤️<br><br>This Rakhi is a promise that no matter how far we go,<br>we will always be there for each other."</p>
+                <h3 class="elegant-title mt-2">Happy Raksha Bandhan, My Dear <span class="sister-name-display">Akka</span>! ❤️</h3>
+            </div>
+        </section>
+
+        <!-- Section 2.2: Funny Sister Question -->
+        <section id="funny-question-section" class="full-screen section-padding hidden-section text-center">
+            <div class="card funny-card" style="background: #fff; max-width: 600px; width: 90%; padding: 3rem 1.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--gold); margin: 0 auto; position: relative;">
+                <h2 class="card-title text-center" style="font-size: 1.5rem; color: #666;">One Little Question For You... 👀</h2>
+                <h3 class="elegant-title mt-2" style="font-size: 2.5rem;">Do you love your brother? ❤️</h3>
+                
+                <div class="funny-messages mt-2" id="funny-message-container" style="min-height: 30px; font-weight: bold; color: var(--primary-red); font-size: 1.2rem;"></div>
+
+                <div class="funny-buttons-container mt-4" style="position: relative; display: flex; justify-content: center; gap: 20px; min-height: 60px;">
+                    <button id="yes-btn" class="primary-btn pulse-fast yes-glow-btn">YES ❤️</button>
+                    <button id="no-btn" class="secondary-btn">NO 😜</button>
+                </div>
+
+                <div id="funny-success" class="hidden mt-4">
+                    <h2 class="success-msg" style="font-size: 3rem;">I Knew It! 😍❤️</h2>
+                    <p class="subtitle mt-2" style="font-size: 1.5rem; color: var(--dark-red); font-weight: bold;">You are the best sister in the world!</p>
+                    <h3 class="elegant-title mt-2" style="font-size: 2.5rem;">Happy Raksha Bandhan! 🪷❤️</h3>
+                    
+                    <div style="margin-top: 15px; display: inline-block; animation: bounce 2s infinite ease-in-out;">
+                        <img src="assets/anime_brother.jpg" alt="Happy Brother" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.5: Bonding Photo -->
+        <section id="bonding-section" class="section-padding hidden-section text-center mt-5">
+            <h2 class="elegant-title mb-4">A Bond Like No Other 💖</h2>
+            <div class="polaroid-frame">
+                <img src="assets/bonding_photo.jpg" alt="Brother and Sister Bonding">
+                <div class="polaroid-caption">Always Together! ✨</div>
+            </div>
+        </section>
+
+        <!-- Section 3: Personalized Message -->
+        <section id="message-section" class="full-screen section-padding hidden-section">
+            <div class="card message-card">
+                <h2 class="card-title text-center">Just For You, <span class="sister-name-display">Akka</span> 💖</h2>
+                <div class="letter-content" id="typewriter-text">
+                    <!-- Text generated via JS -->
+                </div>
+                <p class="letter-signoff text-right mt-4" style="opacity: 0;">
+                    With lots of love,<br>
+                    <strong class="brother-name-display">Your Brother</strong>
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: 3D Gift Box Section -->
+        <section id="gift-section" class="full-screen section-padding hidden-section text-center">
+            <h2 class="elegant-title">🎁 Your Special Gift</h2>
+            <p class="subtitle">Because you deserve something special. ❤️</p>
+            
+            <div class="gift-scene mt-4">
+                <div class="gift-box" id="css-gift-box">
+                    <!-- The 3D Three.js gift will render in its own canvas here -->
+                    <div id="gift-canvas-container" style="width: 300px; height: 300px; margin: 0 auto; position: relative;"></div>
+                    
+                    <!-- We can keep a simplified version or hidden for fallback, but for now we'll just have the canvas container -->
+                    <div class="box-lid hidden">
+                        <div class="lid-top"></div>
+                        <div class="lid-side front"></div>
+                        <div class="lid-side back"></div>
+                        <div class="lid-side left"></div>
+                        <div class="lid-side right"></div>
+                        <div class="ribbon-bow">🎀</div>
+                    </div>
+                    <div class="box-body">
+                        <div class="body-side front"></div>
+                        <div class="body-side back"></div>
+                        <div class="body-side left"></div>
+                        <div class="body-side right"></div>
+                        <div class="body-side bottom"></div>
+                        <!-- The Gift inside -->
+                        <div class="inner-gift hidden">
+                            <img src="assets/popping_image.jpg" alt="Special Gift" class="popping-image">
+                            <p class="text-gold mt-2">A Beautiful Memory!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="open-another-btn" class="primary-btn mt-4 hidden">Open Another Surprise</button>
+        </section>
+
+        <!-- Section 5: Memories (3D Tilt) -->
+        <section id="memories-section" class="section-padding hidden-section">
+            <h2 class="elegant-title text-center">Our Beautiful Memories 📸</h2>
+            <div class="memories-grid mt-4">
+                <div class="tilt-wrapper">
+                    <div class="memory-card">
+                        <div class="heart-click-overlay"><i class="fa-solid fa-heart"></i></div>
+                        <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=400&q=80" alt="Memory">
+                        <div class="memory-caption">Partners in Crime 😎</div>
+                        <div class="memory-date">Childhood</div>
+                    </div>
+                </div>
+                <div class="tilt-wrapper">
+                    <div class="memory-card">
+                        <div class="heart-click-overlay"><i class="fa-solid fa-heart"></i></div>
+                        <img src="https://images.unsplash.com/photo-1473621038790-b788dc470bf6?auto=format&fit=crop&w=400&q=80" alt="Memory">
+                        <div class="memory-caption">Childhood Memories ❤️</div>
+                        <div class="memory-date">Forever</div>
+                    </div>
+                </div>
+                <div class="tilt-wrapper">
+                    <div class="memory-card">
+                        <div class="heart-click-overlay"><i class="fa-solid fa-heart"></i></div>
+                        <img src="https://images.unsplash.com/photo-1529156069898-49953eb1f5ce?auto=format&fit=crop&w=400&q=80" alt="Memory">
+                        <div class="memory-caption">Always Together 🤗</div>
+                        <div class="memory-date">Always</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Promise Section -->
+        <section id="promises-section" class="section-padding hidden-section text-center">
+            <h2 class="elegant-title">🤝 My Rakhi Promise</h2>
+            <div class="promises-container mt-4">
+                <div class="promise-card"><i class="fa-solid fa-heart pop-icon"></i> I will always support you. <i class="fa-solid fa-sparkles tiny-sparkle"></i></div>
+                <div class="promise-card"><i class="fa-solid fa-shield-heart pop-icon"></i> I will always protect you. <i class="fa-solid fa-sparkles tiny-sparkle"></i></div>
+                <div class="promise-card"><i class="fa-solid fa-face-smile pop-icon"></i> I will always make you smile. <i class="fa-solid fa-sparkles tiny-sparkle"></i></div>
+                <div class="promise-card"><i class="fa-solid fa-star pop-icon"></i> I will always celebrate your success. <i class="fa-solid fa-sparkles tiny-sparkle"></i></div>
+                <div class="promise-card"><i class="fa-solid fa-hands-holding-child pop-icon"></i> I will always be there for you. <i class="fa-solid fa-sparkles tiny-sparkle"></i></div>
+            </div>
+        </section>
+
+        <!-- Section 7: Interactive Hearts -->
+        <section id="hearts-section" class="full-screen section-padding hidden-section text-center">
+            <h2 class="elegant-title">Send Some Love ❤️</h2>
+            <div class="heart-counter-wrapper mt-4 position-relative">
+                <button id="send-love-btn" class="heart-btn pulse-fast"><i class="fa-solid fa-heart"></i></button>
+                <p class="mt-4 counter-text">Love sent: <span id="love-count">0</span> ❤️</p>
+                <p id="love-msg" class="success-msg hidden mt-2">Love sent successfully! ❤️</p>
+            </div>
+            <div id="radial-hearts-container"></div>
+        </section>
+
+        <!-- Section 8: Final Surprise -->
+        <section id="final-section" class="full-screen section-padding hidden-section text-center">
+            <div class="content-wrapper final-wrapper">
+                <h2 class="elegant-title final-text">
+                    One Thread.<br>
+                    One Promise.<br>
+                    One Beautiful Bond.<br>
+                    Forever. ❤️
+                </h2>
+                <h1 class="elegant-title mt-4 highlight glow-text">Happy Raksha Bandhan, <span class="sister-name-display">Akka</span>! 🪷</h1>
+                <p class="poetic-text mt-2">Forever your brother's little/big akka ❤️</p>
+                
+                <div class="action-buttons mt-4">
+                    <button id="replay-btn" class="secondary-btn">Replay Surprise 🔄</button>
+                </div>
+            </div>
+            <!-- Decorative background elements -->
+            <div class="diya-container bottom-left-diya"><i class="fa-solid fa-fire-flame-curved flame"></i><div class="diya-base"></div></div>
+            <div class="diya-container bottom-right-diya"><i class="fa-solid fa-fire-flame-curved flame"></i><div class="diya-base"></div></div>
+        </section>
+
+    </div>
+
+    <script src="three-scene.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
